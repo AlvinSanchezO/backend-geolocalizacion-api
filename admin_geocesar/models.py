@@ -1,0 +1,27 @@
+from django.db import models
+from django.contrib.auth.models import User
+from Herramientas.get_direccion_cesar import get_direccion_cesarcore
+
+class Empleado(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    nombre_completo = models.CharField(max_length=200)
+    puesto = models.CharField(max_length=100)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre_completo
+
+class Direccion(models.Model):
+    empleado = models.ForeignKey(Empleado, on_delete=models.CASCADE)
+    latitud = models.CharField(max_length=50)
+    longitud = models.CharField(max_length=50)
+    direccion_completa = models.CharField(max_length=300, blank=True, null=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+
+    def __str__(self):
+        return f"{self.empleado.nombre_completo}"
+    
+    def save(self, *args, **kwargs):
+        self.direccion_completa = get_direccion_cesarcore(self.latitud, self.longitud)
+        super().save(*args, **kwargs)
